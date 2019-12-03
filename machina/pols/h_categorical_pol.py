@@ -48,10 +48,10 @@ class H_CategoricalPol(BasePol):
             pi, hs = self.net(obs, hs, h_masks)
             self.hs = hs
         else:
-            pi = self.net(obs)
+            pi , latent= self.net(obs)
         ac = self.pd.sample(dict(pi=pi))
         ac_real = self.convert_ac_for_real(ac.detach().cpu().numpy())
-        return ac_real, ac, dict(pi=pi, hs=hs, latent)
+        return ac_real, ac, dict(pi=pi, hs=hs, latent = latent)
 
     def deterministic_ac_real(self, obs, hs=None, h_masks=None):
         """
