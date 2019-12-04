@@ -106,6 +106,7 @@ class GaussianPol_VAE(BasePol):
         mean_real = self.convert_ac_for_real(mean.detach().cpu().numpy())
         return mean_real, mean, dict(mean=mean, log_std=log_std, hs=hs, latent=latent)
 
+
 def mini_weight_init(m):
     if m.__class__.__name__ == 'Linear':
         m.weight.data.copy_(uniform_(m.weight.data, -3e-3, 3e-3))
@@ -125,6 +126,7 @@ def log_likelihood(pol, batch):
     llh = pol.pd.llh(acs, pd_params)
     pol_loss = -torch.mean(llh)
     return pol_loss
+
 
 def vae_loss(pol, batch):
     latent_classnum = pol.net.latent_classnum
@@ -151,8 +153,7 @@ def update_pol(pol, optim_pol, batch):
     optim_pol.zero_grad()
     pol_loss.backward()
     optim_pol.step()
-    return pol_loss.detach().cpu().numpy(), llh
-
+    return pol_loss.detach().cpu().numpy(),llh
 
 def train(expert_traj, pol, optim_pol, seq_length=10, epoch=100):
     pol_losses = []
@@ -192,8 +193,6 @@ def test(expert_traj, pol):
                 pol_loss_mean += pol_loss
     pol_loss_mean = pol_loss_mean/counter
     return dict(Testllh_Loss=[float(pol_loss_mean.detach().cpu().numpy())])
-
-
 
 def mini_weight_init(m):
     if m.__class__.__name__ == 'Linear':
@@ -351,45 +350,5 @@ class VAEPolNet(nn.Module):
                 return torch.softmax(self.output_layer(h), dim=-1), [log_qy, qy]
 
 
-if __name__ == "__main__":
-    #device_name = "cuda"
-    
-    #device = torch.device(device_name)
-    #set_device(device)
 
-    env = GymEnv("Pendulum-v0")
-    env.env.seed(42)
-
-    observation_space = env.observation_space
-    action_space = env.action_space
-
-    from machina.traj import Traj
-    from machina.traj import epi_functional as ef
-    cwd = os.getcwd()
-    with open('/home/hirobuchi.ryota/rl_lab/machina/data/expert_epis/Pendulum-v0_100epis.pkl', 'rb') as f:
-        expert_epis = pickle.load(f)
-    train_epis, test_epis = ef.train_test_split(
-        expert_epis, train_size=0.7)
-    train_traj = Traj()
-    train_traj.add_epis(train_epis)
-    train_traj.register_epis()
-    test_traj = Traj()
-    test_traj.add_epis(test_epis)
-    test_traj.register_epis()
-    expert_rewards = [np.sum(epi['rews']) for epi in expert_epis]
-    expert_mean_rew = np.mean(expert_rewards)
-    pol_net = VAEPolNet(observation_space, action_space)
-    if isinstance(action_space, gym.spaces.Box):
-        pol = GaussianPol_VAE(observation_space, action_space, pol_net)
-    elif isinstance(action_space, gym.spaces.Discrete):
-        pol = CategoricalPol(observation_space, action_space, pol_net)
-    elif isinstance(action_space, gym.spaces.MultiDiscrete):
-        pol = MultiCategoricalPol(observation_space, action_space, pol_net)
-    else:
-        raise ValueError('Only Box, Discrete, and MultiDiscrete are supported')
-    optim_pol = torch.optim.Adam(pol_net.parameters())
-    result_dict =train(
-            train_traj, pol, optim_pol,
-            seq_length=10, epoch=100
-        )
-    print(result_dict)  
+      
