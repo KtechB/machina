@@ -19,6 +19,10 @@ CODE="$(awk '/_warning_/ {print $NF}' /tmp/cookie)"
 curl -Lb /tmp/cookie "https://drive.google.com/uc?export=download&confirm=${CODE}&id=1oZ6buPdpFxsp33HY3BVaS2pBHY-1p7OT" -o data/expert_epis/Pendulum-v0_100epis.pkl
 ```
 
+curl -sc /tmp/cookie "https://drive.google.com/uc?export=download&id=1_tiy1jiGm9CIh0SQYkqvSnSicRhTbk-N" > /dev/null
+CODE="$(awk '/_warning_/ {print $NF}' /tmp/cookie)"
+curl -Lb /tmp/cookie "https://drive.google.com/uc?export=download&confirm=${CODE}&id=1_tiy1jiGm9CIh0SQYkqvSnSicRhTbk-N" -o data/expert_epis/HalfCheetahBulletEnv-v0_100epis.pkl
+https://drive.google.com/open?id=1_tiy1jiGm9CIh0SQYkqvSnSicRhTbk-N
 ### Download Expert Pols
 Download data of expert pols from [here](https://drive.google.com/open?id=181I8jwlfRtK5yx2M95c7zZisrEfwfgLw) into `../data/expert_pols`.
 
