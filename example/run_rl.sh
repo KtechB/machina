@@ -5,5 +5,5 @@ python run_behavior_clone.py \
 --record \
 --expert_dir "/home/hirobuchi.ryota/rl_lab/GAILs/data" \
 --expert_fname "expert_gym_flatworld:Flatworld-v0_10_s42.pkl" \
-
+--log "bc_models"
 # --max_epis 100 \
